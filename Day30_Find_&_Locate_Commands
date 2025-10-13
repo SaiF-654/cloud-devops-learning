@@ -1,0 +1,108 @@
+Searching for Files by using find and locate Linux Commands
+
+Industry Scenario:
+You are working as a DevOps Engineer in a software company. A new version of a critical application component is ready, and you are tasked to:
+Find all .txt configuration files from a deployment directory for review.
+Locate an archived log file named backup.gz.tar to verify an issue reported by QA team (Quality Assurance)
+
+
+
+Tasks:
+🔍 Part 1: Using find to Search for .txt Files in a Project Directory
+✅ Task:
+Use the find command to locate all .txt files inside the /opt/devops-app/configs/ directory.
+🧾 Steps:
+Open your terminal.
+
+
+Navigate to a simulated project directory or create one:
+
+sudo mkdir -p /opt/devops-app/configs
+sudo touch /opt/devops-app/configs/app1.txt 
+sudo touch /opt/devops-app/configs/readme.md
+sudo touch /opt/devops-app/configs/database/db_config.txt
+Run the find command:
+
+find /opt/devops-app/configs -name "*.txt"
+✅ Expected Output:
+
+/opt/devops-app/configs/app1.txt
+/opt/devops-app/configs/database/db_config.txt
+
+
+🔍 Part 2: Using locate to Search System-Wide for a Specific File
+✅ Task:
+Use locate to find a file called backup.gz.tar which was archived by a backup script.
+🧾 Steps:
+Install and update plocate (if not already installed):
+
+sudo apt update
+sudo apt install plocate
+sudo updatedb (updatedb updates the locate command’s database (usually /var/lib/plocate/plocate.db), which stores a list of all file paths on your system)
+Create a dummy file:
+sudo mkdir -p /var/log/devops-backup
+sudo touch /var/log/devops-backup/backup.gz.tar
+sudo updatedb
+Run the locate command:
+
+locate backup.gz.tar
+✅ Expected Output:
+
+/var/log/devops-backup/backup.gz.tar
+
+
+Bonus Task (Optional):
+Filter files modified in the last 7 days using find:
+
+find /opt/devops-app/configs -name "*.txt" -mtime -7
+
+📁 Dummy Files
+📁 1. users.csv 
+username,email,role
+john,john@example.com,admin
+alice,alice@example.com,developer
+bob,bob@example.com,analyst
+
+📁 2. ec2_instances.csv i-0a1b2c3d4e5f6g7h,WebServer,t2.micro,us-east-1a,34.205.10.1,running
+i-1a2b3c4d5e6f7g8h,DBServer,t2.medium,us-west-2b,52.13.45.10,stopped
+i-9z8y7x6w5v4u3t2s,AppServer,t3.small,eu-central-1a,18.184.22.99,running
+
+📁 3. auth.log 
+May 27 10:23:44 server sshd[12345]: Accepted password for admin from 192.168.1.5 port 45520
+May 27 10:25:10 server sshd[12347]: Failed password for root from 203.0.113.15 port 49821
+May 27 10:26:11 server sshd[12349]: Failed password for user1 from https://198.51.100.22 port 50731
+
+
+
+📁 4. iam_users.csv 
+
+username,created_date,password_enabled,mfa_active,console_access
+dev_user,2024-01-15,true,true,true
+admin_user,2023-12-01,true,false,true
+read_only,2024-05-01,false,false,false
+
+
+
+Combine cut and awk – Extract & Analyze EC2 Instance Data
+cut -d ',' -f3,4 ec2_instances.csv | awk -F ',' '{count[$2]++} END {for (zone in count) print zone, count[zone]}'
+
+Combine cut and sed – Clean & Format IAM User Report
+cut -d ',' -f1,5 iam_users.csv | sed '1d'
+🧰 More Useful Combinations (Real-Life Cloud Scenarios)
+🔐 Get Users Without MFA from IAM Report
+cut -d ',' -f1,4 iam_users.csv | awk -F ',' '$2 == "false" {print $1}'
+
+🛡️ Extract Failed SSH IPs and Clean Output
+grep "Failed password" auth.log | cut -d ' ' -f11 | sed 's/[^0-9\.]//g'
+
+📄 Extract EC2 IDs & Status, Then Format to ID=STATUS
+cut -d ',' -f1,6 ec2_instances.csv | sed 's/,/=/'
+
+
+🔄 Bonus: Combine cut, awk, and sed
+⚙️ Task: Show usernames of console users without MFA, clean header, and format
+cut -d ',' -f1,4,5 iam_users.csv | sed '1d' | awk -F ',' '$2 == "false" && $3 == "true" {print $1}'
+
+
+
+
